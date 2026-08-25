@@ -48,6 +48,12 @@
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out-quint: cubic-bezier(0.83, 0, 0.17, 1);
 
+  /* Drives <Marquee>. Kept here with the rest of the animation vocabulary
+     rather than inside the component, so the reduced-motion rule at the
+     bottom of this file switches it off along with everything else. */
+  --animate-marquee: marquee var(--duration) linear infinite;
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+
   --container-page: 96rem;
 }
 
@@ -271,6 +277,24 @@ html.lenis body {
   will-change: transform;
 }
 
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+  }
+}
+
+@keyframes marquee-vertical {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(calc(-100% - var(--gap)));
+  }
+}
+
 @keyframes grain-shift {
   0% { transform: translate3d(0, 0, 0); }
   33% { transform: translate3d(-2%, 1.5%, 0); }
@@ -292,6 +316,15 @@ html.lenis body {
   }
   .grain {
     animation: none;
+  }
+
+  /* The blanket rule above collapses durations to ~0, which for an infinite
+     translate means the rail jumps to its end state instead of holding still.
+     A marquee has to be stopped outright, not sped up. */
+  .animate-marquee,
+  .animate-marquee-vertical {
+    animation: none !important;
+    transform: none !important;
   }
 
   /* Scroll-triggered reveals are an enhancement, never the delivery mechanism.

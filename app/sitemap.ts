@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 
-import { site } from "@/data/site";
 import { legalLinks } from "@/data/navigation";
+import { servicePages } from "@/data/service-pages";
+import { site } from "@/data/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
@@ -13,8 +14,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 1,
     },
-    // The four document routes. Read from the same list the footer renders, so
-    // a route can never be linked and unlisted at the same time.
+    // The service routes. Read from the same list the pages are generated
+    // from, so a route cannot exist and go unlisted.
+    ...servicePages.map((service) => ({
+      url: `${site.url}/services/${service.slug}`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    })),
+    // The four document routes, read from the list the footer renders.
     ...legalLinks.map((link) => ({
       url: `${site.url}${link.href}`,
       lastModified,
