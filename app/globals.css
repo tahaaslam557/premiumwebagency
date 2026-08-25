@@ -1,0 +1,313 @@
+@import "tailwindcss";
+@import "../components/theme/theme.css";
+
+/* ------------------------------------------------------------------
+   Design tokens
+   Two environments, one vocabulary. The names below are *roles*, not
+   colours — `void` is whatever the page sits on, `bone` is whatever type is
+   written in. The dark values live here because dark is the default; the
+   light theme rebinds the same names further down. Nothing in the app should
+   ever reach past these for a literal colour.
+------------------------------------------------------------------- */
+@theme {
+  --color-void: #050507;
+  --color-ink: #0a0a0e;
+  --color-surface: #101016;
+  --color-elevate: #16161e;
+
+  --color-bone: #f2f0ec;
+  --color-bone-dim: #c9c7c2;
+  --color-mute: #85858f;
+  --color-faint: #4a4a54;
+
+  --color-signal: #4f7fff;
+  --color-signal-bright: #a9c6ff;
+  --color-signal-deep: #1b3ba8;
+
+  /* The only non-accent hue in the system: form errors, and nothing else. */
+  --color-danger: #ff8a8a;
+
+  --color-line: #1c1c24;
+  --color-line-soft: #141419;
+
+  /* The ink a surface is tinted with: white lifts a dark panel, black
+     deepens a light one. Used as `bg-tint/[0.04]` wherever a card needs to
+     read one step off the background. */
+  --color-tint: #ffffff;
+
+  --font-display: var(--font-display), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-sans), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  --text-display-xl: clamp(3.5rem, 13vw, 13rem);
+  --text-display-lg: clamp(2.75rem, 9vw, 8.5rem);
+  --text-display-md: clamp(2.25rem, 6vw, 5rem);
+  --text-display-sm: clamp(1.75rem, 4vw, 3rem);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quint: cubic-bezier(0.83, 0, 0.17, 1);
+
+  --container-page: 96rem;
+}
+
+/* ------------------------------------------------------------------
+   Base
+------------------------------------------------------------------- */
+:root {
+  color-scheme: dark;
+  --gutter: clamp(1.25rem, 4vw, 4.5rem);
+  --nav-h: 4.5rem;
+
+  /* Type gradient and scrollbar are the two places a raw colour is
+     unavoidable; they get their own tokens so the light theme can rebind
+     them rather than fight them with overrides. */
+  --grad-top: #ffffff;
+  --grad-mid: #c9c7c2;
+  --grad-end: #6f6f79;
+  --scrollbar-thumb: #22222c;
+  --scrollbar-thumb-hover: #2e2e3a;
+  --grain-opacity: 0.032;
+}
+
+/* ------------------------------------------------------------------
+   Light theme
+   Not an inversion — a warm editorial paper stock with near-black ink and a
+   deeper, printed blue. Every token above is rebound; no component needs to
+   know which theme is running.
+------------------------------------------------------------------- */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --color-void: #f4f2ed;
+  --color-ink: #efece4;
+  --color-surface: #ffffff;
+  --color-elevate: #fbfaf7;
+
+  --color-bone: #111111;
+  --color-bone-dim: #3b3a36;
+  --color-mute: #6b6862;
+  --color-faint: #a09c93;
+
+  --color-signal: #2563eb;
+  /* "bright" means *more* signal, which on paper reads as deeper ink. */
+  --color-signal-bright: #1741c4;
+  --color-signal-deep: #c3d5ff;
+
+  --color-danger: #b3261e;
+
+  --color-line: rgba(17, 17, 17, 0.13);
+  --color-line-soft: rgba(17, 17, 17, 0.055);
+
+  --color-tint: #101014;
+
+  --grad-top: #000000;
+  --grad-mid: #2f2e2b;
+  --grad-end: #8a867d;
+  --scrollbar-thumb: rgba(17, 17, 17, 0.18);
+  --scrollbar-thumb-hover: rgba(17, 17, 17, 0.3);
+  /* Grain is a dark noise plate: on paper a little goes much further. */
+  --grain-opacity: 0.02;
+}
+
+* {
+  border-color: var(--color-line);
+}
+
+html {
+  background-color: var(--color-void);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--color-void);
+  color: var(--color-bone);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv01", "tnum" 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Lenis owns scroll position; keep native smooth-scroll out of the way. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+::selection {
+  background: var(--color-signal);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-signal-bright);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Scrollbar — thin, quiet, present. */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-void);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* ------------------------------------------------------------------
+   Utilities
+------------------------------------------------------------------- */
+@utility page {
+  width: 100%;
+  max-width: var(--container-page);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+@utility label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-mute);
+}
+
+@utility display {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 0.86;
+  text-wrap: balance;
+}
+
+@utility rule {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-line) 12%,
+    var(--color-line) 88%,
+    transparent
+  );
+}
+
+/* Masked reveal used by text and media entrances. */
+@utility clip-reveal {
+  clip-path: inset(0 0 100% 0);
+}
+
+@utility text-gradient-bone {
+  background: linear-gradient(
+    180deg,
+    var(--grad-top) 0%,
+    var(--grad-mid) 62%,
+    var(--grad-end) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility glass {
+  background: color-mix(in oklab, var(--color-void) 72%, transparent);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+
+/* Fine grid backdrop, sized in a single place. */
+@utility grid-field {
+  background-image:
+    linear-gradient(to right, var(--color-line-soft) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-line-soft) 1px, transparent 1px);
+  background-size: 88px 88px;
+}
+
+/* ------------------------------------------------------------------
+   Skip link
+   Parked off-screen with `translate` rather than `sr-only` so it animates in,
+   and on `:focus` rather than `:focus-visible` — a skip link should appear for
+   any focus, including one moved programmatically.
+------------------------------------------------------------------- */
+.skip-link {
+  position: fixed;
+  top: 1.5rem;
+  left: 1.5rem;
+  z-index: 200;
+  translate: 0 -6rem;
+  transition: translate 300ms var(--ease-out-expo);
+}
+
+.skip-link:focus {
+  translate: 0 0;
+}
+
+/* ------------------------------------------------------------------
+   Film grain — one fixed layer, GPU-cheap, never intercepts pointers.
+------------------------------------------------------------------- */
+.grain {
+  position: fixed;
+  inset: -120%;
+  z-index: 90;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain-shift 900ms steps(3) infinite;
+  will-change: transform;
+}
+
+@keyframes grain-shift {
+  0% { transform: translate3d(0, 0, 0); }
+  33% { transform: translate3d(-2%, 1.5%, 0); }
+  66% { transform: translate3d(1.5%, -1%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+/* ------------------------------------------------------------------
+   Reduced motion — content stays whole, cinema stops.
+------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .grain {
+    animation: none;
+  }
+
+  /* Scroll-triggered reveals are an enhancement, never the delivery mechanism.
+     With motion reduced, everything Motion would have animated in is simply
+     present — no intersection required, nothing waiting off-screen. A
+     stylesheet !important beats Motion's inline transform. */
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Native cursor stays available for keyboard and touch users; only the
+   pointer-fine, motion-allowed case hands over to the custom cursor. */
+@media (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  body[data-custom-cursor="on"],
+  body[data-custom-cursor="on"] * {
+    cursor: none;
+  }
+}

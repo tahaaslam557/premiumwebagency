@@ -1,0 +1,247 @@
+/* ------------------------------------------------------------------
+   Theme layer — the reality shift and the lamp that causes it.
+
+   Everything here is either (a) painted from the role tokens in globals.css
+   so it themes itself, or (b) a lamp-local variable the component drives
+   imperatively from its animation loop. No component-level colour literals.
+------------------------------------------------------------------- */
+
+/* ------------------------------------------------------------------
+   Reality shift
+   One fixed plate. It expands as a circle from the lamp carrying the
+   *incoming* background, covers the page, and only then is `data-theme`
+   flipped underneath it — so the swap itself is never seen as a snap. The
+   plate then fades, revealing the new environment from the lamp outward.
+
+   z-index sits above the header (100) and the grain (90) but below the
+   custom cursor (120) and the lamp itself, which must stay visible: it is
+   the apparent source of the wave, not a casualty of it.
+------------------------------------------------------------------- */
+.reality-shift {
+  position: fixed;
+  inset: 0;
+  z-index: 115;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  will-change: clip-path, opacity;
+  background:
+    radial-gradient(
+      circle at var(--shift-x, 100%) var(--shift-y, 0%),
+      var(--shift-bloom, transparent) 0%,
+      var(--shift-bg, transparent) 38%,
+      var(--shift-bg, transparent) 100%
+    );
+}
+
+.reality-shift[data-active="true"] {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* ------------------------------------------------------------------
+   Lamp
+   A fixed rail dropped from the header's bottom edge, aligned to the right
+   edge of the content grid. The rail never takes pointer events — only the
+   handle does — so the page beneath stays fully clickable.
+------------------------------------------------------------------- */
+.lamp {
+  position: fixed;
+  top: 0;
+  /* The cord drops from the right edge of the *content grid*, not the
+     viewport. Past 96rem the grid stops growing and the two part company by
+     half the leftover width, so the offset is measured from the header itself
+     and published here as `--lamp-right`. The gutter is the pre-measurement
+     fallback and the correct answer on any viewport narrower than the grid. */
+  right: calc(var(--lamp-right, var(--gutter)) - 48px);
+  width: 96px;
+  height: 420px;
+  z-index: 116;
+  pointer-events: none;
+  /* 0 → hanging, 1 → armed. Written once per frame by the drag loop and read
+     by everything below, so tension is one number rather than six. */
+  --pull: 0;
+  transition: opacity 400ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.lamp[data-hidden="true"] {
+  opacity: 0;
+}
+
+/* The container's `pointer-events: none` does not reach the grip — the grip
+   sets `auto` on itself, and a child re-enabling beats a parent disabling. An
+   invisible control that still takes taps is worse than a visible one. */
+.lamp[data-hidden="true"] .lamp-grip {
+  pointer-events: none;
+}
+
+.lamp svg {
+  display: block;
+  overflow: visible;
+}
+
+/* The mount reads as hardware bolted to the header, not as decoration. */
+.lamp-mount-plate {
+  fill: var(--color-surface);
+  stroke: var(--color-line);
+  stroke-width: 1;
+}
+
+.lamp-mount-socket {
+  fill: var(--color-void);
+  stroke: var(--color-line);
+  stroke-width: 0.75;
+}
+
+.lamp-cord {
+  fill: none;
+  stroke: url(#lamp-cord-gradient);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+/* A second, fainter pass a hair off the first: the cord catches light on one
+   side the way a real braided cable does. */
+.lamp-cord-sheen {
+  fill: none;
+  stroke: var(--color-bone);
+  stroke-width: 0.5;
+  stroke-linecap: round;
+  opacity: 0.16;
+}
+
+.lamp-glow {
+  fill: url(#lamp-glow-gradient);
+}
+
+.lamp-handle-body {
+  fill: var(--color-surface);
+  stroke: var(--color-line);
+  stroke-width: 1;
+}
+
+.lamp-handle-ferrule {
+  fill: var(--color-faint);
+}
+
+.lamp-handle-core {
+  fill: var(--color-signal-bright);
+}
+
+.lamp-handle-ring {
+  fill: none;
+  stroke: var(--color-signal-bright);
+  stroke-width: 1;
+}
+
+/* ------------------------------------------------------------------
+   Hit target
+   Visible handle is ~10px wide; the target is 48. Nobody should have to aim.
+------------------------------------------------------------------- */
+.lamp-grip {
+  position: absolute;
+  left: 24px;
+  top: 0;
+  width: 48px;
+  height: 48px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  pointer-events: auto;
+  /* Without this a downward drag scrolls the page out from under the pull. */
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  will-change: transform;
+}
+
+/* Only ever seen when the custom cursor is off — it sets `cursor: none` on
+   everything with a specificity this cannot, and deliberately so. For coarse
+   pointers and reduced-motion users, the native grab state is the affordance. */
+.lamp-grip {
+  cursor: grab;
+}
+
+.lamp-grip:active {
+  cursor: grabbing;
+}
+
+.lamp-grip:focus-visible {
+  outline: 2px solid var(--color-signal-bright);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------
+   Microcopy
+   Set to the left of the rail, right-aligned into it, and only ever present
+   while the user is actually near the handle.
+------------------------------------------------------------------- */
+.lamp-label {
+  position: absolute;
+  /* Clear of the handle's 30px glow, which reaches rail x=18. */
+  right: 92px;
+  top: 0;
+  white-space: nowrap;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  line-height: 1;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-mute);
+  opacity: 0;
+  translate: 6px 0;
+  pointer-events: none;
+  transition:
+    opacity 320ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    translate 320ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    color 240ms linear;
+  will-change: transform;
+}
+
+.lamp[data-state="hover"] .lamp-label,
+.lamp[data-state="dragging"] .lamp-label,
+.lamp[data-state="threshold"] .lamp-label {
+  opacity: 1;
+  translate: 0 0;
+}
+
+.lamp[data-state="threshold"] .lamp-label {
+  color: var(--color-signal-bright);
+}
+
+/* ------------------------------------------------------------------
+   Ground-dependent artwork
+   Some marks are drawn for a ground rather than tinted by it — a logo in
+   near-black ink cannot be filtered onto a black page. Those ship as a pair
+   and swap here, in CSS, so the right one is already painted on the frame
+   the theme flips rather than one render later.
+------------------------------------------------------------------- */
+:root[data-theme="light"] .on-dark {
+  display: none;
+}
+
+:root:not([data-theme="light"]) .on-light {
+  display: none;
+}
+
+/* ------------------------------------------------------------------
+   Reduced motion
+   The lamp stops being a machine and becomes a control. Everything it does
+   is still available; none of it moves.
+------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .lamp {
+    transition: none;
+  }
+  .lamp-label {
+    transition: none;
+  }
+  .lamp-glow {
+    display: none;
+  }
+  .reality-shift {
+    display: none;
+  }
+}
