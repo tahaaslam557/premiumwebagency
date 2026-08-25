@@ -9,6 +9,12 @@ import { cn } from "@/lib/utils";
 import { methodology } from "@/data/methodology";
 
 /**
+ * Where down the viewport a stage counts as "the one being read". Slightly
+ * above centre, which is where the eye actually sits.
+ */
+const READING_LINE = 0.45;
+
+/**
  * The operating model. A sticky readout on the left tracks whichever stage is
  * under the fold on the right — scroll-driven, but with every stage rendered in
  * the document so it reads fine with scripting reduced or motion disabled.
@@ -17,24 +23,50 @@ export function Methodology() {
   const [active, setActive] = useState(0);
   const stageRefs = useRef<Array<HTMLLIElement | null>>([]);
 
+  // Five stages "run in order", so the readout has to move in order too, and
+  // an IntersectionObserver cannot promise that. It reports only the entries
+  // whose intersection *changed*, so the most central stage is often not in
+  // the batch at all; and ranking what is there by `intersectionRatio` ranks
+  // by *proportion of the element*, which a -40%/-40% band turns into a
+  // measure of how short the element is rather than how central. Between them
+  // the stage counter ran 1 -> 2 -> 1 -> 3, skipping one and going backwards
+  // while the page scrolled forwards.
+  //
+  // A reading line answers the question directly: the active stage is the last
+  // one whose top has crossed it. Tops are monotonic in document order, so
+  // this steps 0->1->2->3->4 and back again and cannot skip or invert.
   useEffect(() => {
-    const nodes = stageRefs.current.filter(Boolean) as HTMLLIElement[];
-    if (!nodes.length) return;
+    let frame = 0;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const top = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (!top) return;
-        const index = Number((top.target as HTMLElement).dataset.index);
-        if (!Number.isNaN(index)) setActive(index);
-      },
-      { rootMargin: "-40% 0px -40% 0px", threshold: [0, 0.4, 1] },
-    );
+    const measure = () => {
+      frame = 0;
+      const nodes = stageRefs.current.filter(Boolean) as HTMLLIElement[];
+      if (!nodes.length) return;
 
-    nodes.forEach((node) => observer.observe(node));
-    return () => observer.disconnect();
+      const line = window.innerHeight * READING_LINE;
+      let next = 0;
+      for (let index = 0; index < nodes.length; index += 1) {
+        if (nodes[index].getBoundingClientRect().top > line) break;
+        next = index;
+      }
+      setActive((previous) => (previous === next ? previous : next));
+    };
+
+    const onScroll = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(measure);
+    };
+
+    measure();
+    // Lenis drives the page through native scroll, so this needs no special
+    // case for it.
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
   }, []);
 
   const current = methodology[active];
