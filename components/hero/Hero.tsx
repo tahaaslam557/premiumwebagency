@@ -6,6 +6,7 @@ import { motion } from "motion/react";
 
 import { ButtonLink } from "@/components/ui/Button";
 import { Scramble } from "@/components/motion/Scramble";
+import { HeroGrid } from "./HeroGrid";
 import { SystemStatus } from "./SystemStatus";
 import { onBootReady } from "@/lib/boot";
 import { EASE } from "@/lib/constants";
@@ -52,7 +53,7 @@ export function Hero() {
       className="relative flex min-h-[100svh] flex-col overflow-hidden bg-void pt-[var(--nav-h)]"
     >
       {/* Depth stack: grid field, 3D core, radial falloff, content. */}
-      <div className="grid-field pointer-events-none absolute inset-0 opacity-[0.55]" aria-hidden />
+      <HeroGrid />
 
       <div className="pointer-events-none absolute inset-0 lg:left-[38%]">
         {sceneMounted ? (
