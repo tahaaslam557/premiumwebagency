@@ -7,7 +7,7 @@ import { SmoothScroll } from "@/components/motion/SmoothScroll";
 import { Cursor } from "@/components/ui/Cursor";
 import { Grain } from "@/components/ui/Grain";
 import { Preloader } from "@/components/hero/Preloader";
-import { NO_FLASH_SCRIPT, THEME_COLOR } from "@/lib/theme";
+import { DEFAULT_THEME, NO_FLASH_SCRIPT, THEME_COLOR } from "@/lib/theme";
 import { contact, reputation, site } from "@/data/site";
 
 const display = Geist({
@@ -67,10 +67,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  // Dark is the served default; the boot script rewrites the meta tag to the
+  // Light is the served default; the boot script rewrites the meta tag to the
   // resolved theme before paint, and the provider keeps it in step after.
-  themeColor: THEME_COLOR.dark,
-  colorScheme: "dark light",
+  themeColor: THEME_COLOR[DEFAULT_THEME],
+  colorScheme: "light dark",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -114,18 +114,18 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    // `data-theme` is served as dark and corrected in <head> before first
-    // paint, so React must be told not to police this one attribute.
+    // `data-theme` is served as the default and corrected in <head> before
+    // first paint, so React must be told not to police this one attribute.
     <html
       lang="en"
-      data-theme="dark"
+      data-theme={DEFAULT_THEME}
       suppressHydrationWarning
       className={`${display.variable} ${mono.variable}`}
     >
       <head>
-        {/* Runs before anything paints: reads the stored choice, falls back to
-            the system preference, then to dark. Without it the page would
-            flash the wrong environment on every load. */}
+        {/* Runs before anything paints: reads the stored choice and falls
+            back to the default environment — never to the OS setting. Without
+            it the page would flash the wrong one on every load. */}
         <script dangerouslySetInnerHTML={{ __html: NO_FLASH_SCRIPT }} />
       </head>
       <body>

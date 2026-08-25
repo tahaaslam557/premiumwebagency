@@ -17,6 +17,11 @@ const IDLE: CursorState = { label: "", mode: "default" };
  * Elements opt in with `data-cursor="view|explore|action|text"` and an optional
  * `data-cursor-label`. Touch, coarse pointers and reduced-motion users keep the
  * native cursor — nothing here is required to operate the site.
+ *
+ * Every colour here is the accent role — `--color-signal` / `-bright` — read
+ * live from the custom property rather than captured in React state. The rope
+ * rebinds those on `<html>`, so the cursor is already the new colour on the
+ * frame the theme flips; there is nothing here to keep in step by hand.
  */
 export function Cursor() {
   const fine = useHasFinePointer();
@@ -118,24 +123,24 @@ export function Cursor() {
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[120]">
       <div
         ref={ringRef}
-        className="fixed left-0 top-0 flex items-center justify-center rounded-full border border-bone/35 backdrop-blur-[1px] transition-[width,height,opacity,background-color,border-color] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+        className="fixed left-0 top-0 flex items-center justify-center rounded-full border backdrop-blur-[1px] transition-[width,height,opacity,background-color,border-color] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
         style={{
           width: ringSize,
           height: ringSize,
           opacity: visible ? 1 : 0,
           backgroundColor: expanded ? "color-mix(in oklab, var(--color-signal) 14%, transparent)" : "transparent",
-          borderColor: expanded ? "color-mix(in oklab, var(--color-signal-bright) 55%, transparent)" : "color-mix(in oklab, var(--color-bone) 32%, transparent)",
+          borderColor: expanded ? "color-mix(in oklab, var(--color-signal-bright) 65%, transparent)" : "color-mix(in oklab, var(--color-signal) 45%, transparent)",
         }}
       >
         {hasLabel ? (
-          <span className="label !text-[0.5625rem] !text-bone whitespace-nowrap">
+          <span className="label !text-[0.5625rem] !text-signal-bright whitespace-nowrap">
             {state.label}
           </span>
         ) : null}
       </div>
       <div
         ref={dotRef}
-        className="fixed left-0 top-0 rounded-full bg-bone transition-[width,height,opacity] duration-200"
+        className="fixed left-0 top-0 rounded-full bg-signal transition-[width,height,opacity] duration-200"
         style={{
           width: pressed ? 10 : expanded ? 0 : 5,
           height: pressed ? 10 : expanded ? 0 : 5,
