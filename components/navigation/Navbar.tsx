@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 
@@ -9,7 +10,7 @@ import { LampThemeToggle } from "@/components/theme/LampThemeToggle";
 import { MobileMenu } from "./MobileMenu";
 import { EASE } from "@/lib/constants";
 import { useScrollY } from "@/lib/hooks";
-import { cn } from "@/lib/utils";
+import { cn, sectionHref } from "@/lib/utils";
 import { navigation } from "@/data/navigation";
 import { contact, site } from "@/data/site";
 
@@ -19,6 +20,7 @@ import { contact, site } from "@/data/site";
  * they are in the document.
  */
 export function Navbar() {
+  const pathname = usePathname();
   const scrollY = useScrollY();
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState<string>("");
@@ -73,7 +75,7 @@ export function Navbar() {
           className="page flex items-center justify-between transition-[height] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
           style={{ height: "var(--nav-h)" }}
         >
-          <a href="#hero" aria-label={`${site.name} — home`} className="flex items-center gap-3">
+          <a href={sectionHref("#hero", pathname)} aria-label={`${site.name} — home`} className="flex items-center gap-3">
             {/* Two marks, one alt text. The `-dark` file is the mark recoloured
                 for dark grounds; the original is drawn in near-black ink and
                 belongs on paper. Swapped in CSS rather than in state so the
@@ -107,7 +109,7 @@ export function Navbar() {
             {navigation.map((item) => (
               <a
                 key={item.href}
-                href={item.href}
+                href={sectionHref(item.href, pathname)}
                 className={cn(
                   "group relative rounded-full px-4 py-2 text-sm transition-colors duration-300",
                   active === item.href ? "text-bone" : "text-mute hover:text-bone",
@@ -141,7 +143,7 @@ export function Navbar() {
               {contact.phone}
             </a>
 
-            <ButtonLink href="#contact" size="sm" className="hidden sm:inline-flex">
+            <ButtonLink href={sectionHref("#contact", pathname)} size="sm" className="hidden sm:inline-flex">
               Start project
             </ButtonLink>
 

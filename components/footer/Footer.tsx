@@ -1,15 +1,20 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { MaskText } from "@/components/motion/MaskText";
 import { Reveal } from "@/components/motion/Reveal";
 import { footerColumns, legalLinks, navigation } from "@/data/navigation";
 import { contact, site, socials } from "@/data/site";
+import { sectionHref } from "@/lib/utils";
 
 /** Final system screen: statement, index, contact, legal, live status. */
 export function Footer() {
+  const pathname = usePathname();
+
   return (
     <footer className="relative overflow-hidden border-t border-line bg-void">
       <div className="page pt-24 lg:pt-32">
@@ -85,7 +90,7 @@ export function Footer() {
                   {column.links.map((link) => (
                     <li key={link.label}>
                       <a
-                        href={link.href}
+                        href={sectionHref(link.href, pathname)}
                         className="text-sm text-mute transition-colors hover:text-bone"
                       >
                         {link.label}
@@ -105,7 +110,7 @@ export function Footer() {
             {navigation.map((item) => (
               <a
                 key={item.href}
-                href={item.href}
+                href={sectionHref(item.href, pathname)}
                 className="label transition-colors hover:!text-bone"
               >
                 <span className="!text-faint">{item.index}</span> {item.label}
@@ -132,14 +137,12 @@ export function Footer() {
           <ul className="flex flex-wrap gap-x-5 gap-y-2">
             {legalLinks.map((link) => (
               <li key={link.label}>
-                <a
+                <Link
                   href={link.href}
-                  target="_blank"
-                  rel="noreferrer noopener"
                   className="text-xs text-faint transition-colors hover:text-bone-dim"
                 >
                   {link.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>

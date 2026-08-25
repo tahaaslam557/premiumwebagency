@@ -14,6 +14,7 @@ import {
 import { gsap } from "@/lib/gsap";
 import { usePrefersReducedMotion } from "@/lib/hooks";
 import {
+  DEFAULT_THEME,
   isTheme,
   SHIFT_BACKGROUND,
   SHIFT_BLOOM,
@@ -57,36 +58,25 @@ function readStored(): Theme | null {
  */
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const reduced = usePrefersReducedMotion();
-  const [theme, setThemeState] = useState<Theme>("dark");
+  const [theme, setThemeState] = useState<Theme>(DEFAULT_THEME);
   const [switching, setSwitching] = useState(false);
 
   const shiftRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
-  /** Set the moment the user makes a choice; system changes stop applying. */
-  const explicitRef = useRef(false);
 
   // Adopt whatever the boot script resolved, rather than assuming a default.
   // `apply` runs again here for one reason: the boot script deliberately does
   // not touch <meta name="theme-color">, because Next renders that tag and the
   // ordering between the two is not ours to rely on.
+  //
+  // Nothing here consults `prefers-color-scheme`. A visitor with no stored
+  // choice gets DEFAULT_THEME on every visit, and the only thing that ever
+  // changes that is their own hand on the rope.
   useEffect(() => {
     const current = document.documentElement.getAttribute(THEME_ATTR);
-    const resolved = isTheme(current) ? current : "dark";
+    const resolved = isTheme(current) ? current : (readStored() ?? DEFAULT_THEME);
     setThemeState(resolved);
     apply(resolved);
-    explicitRef.current = readStored() !== null;
-  }, []);
-
-  // Follow the OS only while the user has never expressed a preference.
-  useEffect(() => {
-    const mql = window.matchMedia("(prefers-color-scheme: light)");
-    const onChange = () => {
-      if (explicitRef.current) return;
-      apply(mql.matches ? "light" : "dark");
-      setThemeState(mql.matches ? "light" : "dark");
-    };
-    mql.addEventListener("change", onChange);
-    return () => mql.removeEventListener("change", onChange);
   }, []);
 
   useEffect(() => () => void timelineRef.current?.kill(), []);
@@ -95,7 +85,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     (next: Theme, origin?: ShiftOrigin) => {
       if (next === document.documentElement.getAttribute(THEME_ATTR)) return;
 
-      explicitRef.current = true;
       try {
         localStorage.setItem(THEME_KEY, next);
       } catch {
@@ -208,5 +197,5 @@ export function useTheme() {
  * layers, which are also rendered by isolated tooling and tests.
  */
 export function useOptionalTheme(): Theme {
-  return useContext(ThemeContext)?.theme ?? "dark";
+  return useContext(ThemeContext)?.theme ?? DEFAULT_THEME;
 }

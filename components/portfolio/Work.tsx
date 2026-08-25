@@ -62,10 +62,20 @@ export function Work() {
       // At lg the section becomes a fixed-height column: header on top, the
       // horizontal track taking whatever is left. Without that the pinned
       // section is taller than the viewport and the cards get cut off.
-      className="relative border-t border-line bg-void lg:flex lg:h-[100svh] lg:flex-col lg:overflow-hidden"
+      // `--track-reserve` is everything the pinned track spends on something
+      // other than a card: this section's header, the panel's own header, the
+      // service tags and the gaps between them. The cards read it to work out
+      // how tall they are allowed to be. One number, one threshold — the
+      // header tightens and the cards shrink at the same moment, so the two
+      // can never disagree and collide.
+      className="relative border-t border-line bg-void [--track-reserve:30rem] lg:flex lg:h-[100svh] lg:flex-col lg:overflow-hidden [@media(max-height:900px)]:[--track-reserve:28.5rem]"
       aria-labelledby="work-heading"
     >
-      <div className="page flex flex-col gap-8 pt-28 lg:shrink-0 lg:gap-5 lg:pt-24">
+      {/* Once the track is pinned, every pixel this header spends is a pixel
+          the cards below don't get. On a short laptop screen the generous top
+          padding is what pushed the panels up into this text, so it is bought
+          back there and nowhere else. */}
+      <div className="page flex flex-col gap-8 pt-28 lg:shrink-0 lg:gap-5 lg:pt-24 [@media(min-width:1024px)_and_(max-height:900px)]:gap-3 [@media(min-width:1024px)_and_(max-height:900px)]:pt-20">
         <Reveal className="flex items-center gap-4">
           <span className="label !text-signal-bright">
             <span className="tabular-nums">05</span>
@@ -92,7 +102,7 @@ export function Work() {
 
       <div
         ref={track}
-        className="mt-14 flex flex-col gap-20 px-[var(--gutter)] pb-24 lg:mt-6 lg:min-h-0 lg:w-max lg:flex-1 lg:flex-row lg:gap-8 lg:pb-8 lg:will-change-transform"
+        className="mt-14 flex flex-col gap-20 px-[var(--gutter)] pb-24 lg:mt-10 lg:min-h-0 lg:w-max lg:flex-1 lg:flex-row lg:gap-8 lg:pb-8 lg:will-change-transform [@media(min-width:1024px)_and_(max-height:900px)]:mt-6"
       >
         {work.map((sector, index) => (
           <SectorPanel key={sector.key} sector={sector} first={index === 0} />

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "../components/theme/theme.css";
+@import "../components/legal/legal.css";
 
 /* ------------------------------------------------------------------
    Design tokens

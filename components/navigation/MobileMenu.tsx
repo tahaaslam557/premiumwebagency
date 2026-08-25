@@ -1,9 +1,11 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 
 import { EASE } from "@/lib/constants";
 import { useScrollLock } from "@/lib/hooks";
+import { sectionHref } from "@/lib/utils";
 import { navigation } from "@/data/navigation";
 import { contact } from "@/data/site";
 
@@ -13,6 +15,7 @@ type MobileMenuProps = {
 };
 
 export function MobileMenu({ open, onClose }: MobileMenuProps) {
+  const pathname = usePathname();
   useScrollLock(open);
 
   return (
@@ -36,7 +39,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
             {navigation.map((item, index) => (
               <motion.a
                 key={item.href}
-                href={item.href}
+                href={sectionHref(item.href, pathname)}
                 onClick={onClose}
                 className="group flex items-baseline gap-4 border-b border-line/60 py-4"
                 initial={{ opacity: 0, y: 26 }}

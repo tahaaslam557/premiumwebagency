@@ -72,9 +72,15 @@ export const footerColumns = [
   },
 ];
 
+/**
+ * These four used to point out at the old PHP site. They are native routes
+ * now — `app/terms-and-conditions`, `app/sms-terms-and-conditions`,
+ * `app/privacy-policy`, `app/faqs` — and nothing here should ever go back to
+ * an absolute URL on premiumwebagency.com.
+ */
 export const legalLinks = [
-  { label: "Terms of Use", href: "https://premiumwebagency.com/terms-and-conditions.php" },
-  { label: "SMS Terms & Conditions", href: "https://premiumwebagency.com/sms.php" },
-  { label: "Privacy Policy", href: "https://premiumwebagency.com/privacy-policy.php" },
-  { label: "FAQs", href: "https://premiumwebagency.com/faqs.php" },
+  { label: "Terms of Use", href: "/terms-and-conditions" },
+  { label: "SMS Terms & Conditions", href: "/sms-terms-and-conditions" },
+  { label: "Privacy Policy", href: "/privacy-policy" },
+  { label: "FAQs", href: "/faqs" },
 ];

@@ -57,15 +57,24 @@ export function isTheme(value: unknown): value is Theme {
 }
 
 /**
- * Runs before first paint, inlined in <head>. Resolution order is the one the
- * spec asks for: stored choice, then system preference, then dark. It must not
- * throw — private-mode Safari denies localStorage access outright — and it must
- * not depend on anything the bundle has not loaded yet.
+ * The environment a visitor with no stored choice lands in.
+ *
+ * Deliberately a constant rather than `prefers-color-scheme`: the site opens
+ * on paper for everyone, and dark is somewhere you arrive by pulling the rope.
+ * The OS setting is not consulted at all — a first load has one answer.
+ */
+export const DEFAULT_THEME: Theme = "light";
+
+/**
+ * Runs before first paint, inlined in <head>. Resolution is two steps and no
+ * more: the stored choice, then {@link DEFAULT_THEME}. It must not throw —
+ * private-mode Safari denies localStorage access outright — and it must not
+ * depend on anything the bundle has not loaded yet.
  */
 export const NO_FLASH_SCRIPT = `(function(){try{
 var k=${JSON.stringify(THEME_KEY)};
 var s=null;try{s=localStorage.getItem(k)}catch(e){}
-var t=(s==="dark"||s==="light")?s:(window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark");
+var t=(s==="dark"||s==="light")?s:${JSON.stringify(DEFAULT_THEME)};
 var r=document.documentElement;
 r.setAttribute(${JSON.stringify(THEME_ATTR)},t);
 r.style.colorScheme=t;

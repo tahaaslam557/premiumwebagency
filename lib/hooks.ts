@@ -31,6 +31,18 @@ export function useHasFinePointer() {
 }
 
 /**
+ * True when a mouse or trackpad exists at all, even if it is not the primary
+ * input. `pointer: fine` describes only the *primary* pointer, so a laptop
+ * with a touchscreen answers "coarse" and looks identical to a phone — which
+ * is the wrong call for anything that merely wants to know whether a cursor
+ * can ever appear on screen. Use this for that question, and
+ * {@link useHasFinePointer} for "is touch what this person is actually using".
+ */
+export function useHasAnyFinePointer() {
+  return useMediaQuery("(any-pointer: fine)");
+}
+
+/**
  * Normalised pointer position (-1..1) relative to the viewport, sampled on a
  * ref rather than state so consumers can read it inside a rAF loop without
  * re-rendering.

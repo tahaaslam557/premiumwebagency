@@ -1,0 +1,141 @@
+/* ------------------------------------------------------------------
+   Legal prose
+   The four document routes — terms, privacy, SMS terms, FAQs — are the only
+   long-form reading on the site, and they are written as plain markup rather
+   than as sections. One scoped block sets their rhythm so the pages carry no
+   visual language of their own: same type stack, same rule, same accent, same
+   mute. Every colour is a role token from globals.css, so both themes come
+   free.
+------------------------------------------------------------------- */
+.legal-prose {
+  color: var(--color-bone-dim);
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  max-width: 46rem;
+}
+
+.legal-prose > * + * {
+  margin-top: 1.15rem;
+}
+
+/* Section headings read as instrument labels, not as headlines — the page
+   title above them is the only display-scale type on the route. */
+.legal-prose h2 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  font-size: clamp(1.375rem, 2.4vw, 1.75rem);
+  color: var(--color-bone);
+  margin-top: 3.5rem;
+  scroll-margin-top: calc(var(--nav-h) + 2rem);
+}
+
+.legal-prose h2:first-child {
+  margin-top: 0;
+}
+
+.legal-prose h3 {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-signal-bright);
+  margin-top: 2.5rem;
+}
+
+.legal-prose h2 + h3,
+.legal-prose h2 + p,
+.legal-prose h3 + p,
+.legal-prose h3 + ul {
+  margin-top: 1rem;
+}
+
+.legal-prose strong {
+  color: var(--color-bone);
+  font-weight: 500;
+}
+
+.legal-prose em {
+  color: var(--color-mute);
+  font-style: italic;
+}
+
+.legal-prose a {
+  color: var(--color-signal-bright);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in oklab, var(--color-signal-bright) 45%, transparent);
+  transition: text-decoration-color 240ms var(--ease-out-expo, ease);
+}
+
+.legal-prose a:hover {
+  text-decoration-color: currentColor;
+}
+
+.legal-prose ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.legal-prose li {
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+/* A hairline rather than a bullet: the same mark the rest of the site uses to
+   index a list item. */
+.legal-prose li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.82em;
+  width: 0.6rem;
+  height: 1px;
+  background: var(--color-signal);
+  opacity: 0.7;
+}
+
+.legal-prose li > ul {
+  margin-top: 0.6rem;
+}
+
+.legal-prose li > ul li::before {
+  background: var(--color-faint);
+}
+
+/* ------------------------------------------------------------------
+   FAQ list
+   A question and its answer are one unit; the divider belongs between units,
+   not under the last one.
+------------------------------------------------------------------- */
+.legal-faq {
+  display: flex;
+  flex-direction: column;
+}
+
+.legal-faq > * + * {
+  border-top: 1px solid var(--color-line);
+}
+
+.legal-faq dt {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-size: clamp(1.125rem, 2vw, 1.4375rem);
+  line-height: 1.25;
+  color: var(--color-bone);
+}
+
+.legal-faq dd {
+  margin: 0.9rem 0 0;
+  max-width: 46rem;
+  color: var(--color-bone-dim);
+  font-size: 0.9375rem;
+  line-height: 1.75;
+}
