@@ -93,16 +93,20 @@ export function HeroGrid() {
     <div className="pointer-events-none absolute inset-0" data-hero-grid="ripple" aria-hidden>
       <RippleGrid
         gridColor={accent}
-        // Paper takes ink far more readily than a dark ground takes light, and
-        // the headline sits directly on top of this either way — it is a
-        // backdrop, not a pattern to read.
-        opacity={theme === "light" ? 0.26 : 0.6}
+        // Alpha-blending a coloured line over near-white desaturates it: what
+        // survives is `line * a + paper * (1 - a)`, and paper is bright in all
+        // three channels, so a low alpha returns grey. Over near-black the
+        // same line keeps its hue at any alpha, which is why the dark theme
+        // looked right at half this value. On paper the alpha has to be spent
+        // to buy the colour back — and the lines are thinned to pay for it, so
+        // the grid gains saturation without gaining weight.
+        opacity={theme === "light" ? 0.55 : 0.6}
         // Roughly the 88px cell the flat grid has always used at desktop size,
         // so the hero keeps its rhythm and only gains the warp.
         gridSize={20}
-        gridThickness={30}
+        gridThickness={theme === "light" ? 44 : 30}
         rippleIntensity={0.05}
-        glowIntensity={theme === "light" ? 0.04 : 0.12}
+        glowIntensity={theme === "light" ? 0.05 : 0.12}
         fadeDistance={1.6}
         vignetteStrength={2.2}
         mouseInteractionRadius={1.2}

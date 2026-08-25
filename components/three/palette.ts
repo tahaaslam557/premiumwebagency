@@ -82,30 +82,44 @@ const LIGHT: ScenePalette = {
   // is the light source. Warm stone body, soft daylight falloff, and the same
   // blue held at the rim so the form still reads as engineered rather than
   // sculpted.
+  //
+  // Two rules earn every value below, and an earlier pass broke both — which
+  // is how the object arrived as a beige smudge under a shell the same colour
+  // as the page it was drawn on:
+  //
+  //  1. Contrast against paper has to be *spent*, not saved. "Paper needs
+  //     less" is true right up until less becomes none.
+  //  2. `coreFragmentShader` only ever adds — `base`, then light on top of
+  //     it — so `base` is the shadow, never the body colour. Set it mid-grey
+  //     and the lit side just climbs toward the page and the form dissolves.
+  //
+  // Hence: deep slate in shadow, warm stone added back by the key light.
   core: {
-    base: new THREE.Color("#a8a49a"),
-    deep: new THREE.Color("#5f5c55"),
-    signal: new THREE.Color("#3a63c8"),
-    highlight: new THREE.Color("#ffffff"),
+    base: new THREE.Color("#3f4557"),
+    deep: new THREE.Color("#b8b3a4"),
+    signal: new THREE.Color("#2f56bd"),
+    highlight: new THREE.Color("#f7f4ec"),
   },
   // The wireframe shell is additive in the dark, where near-black lines are
-  // nearly free. Normal-blended on paper every line is paid for in full, so
-  // the whole shell is pitched much closer to the ground.
+  // nearly free. Normal-blended on paper every line is paid for in full — so
+  // it is pitched well under the ground rather than just beneath it, or the
+  // lines simply are not there.
   shell: {
-    base: new THREE.Color("#c2c7d2"),
-    deep: new THREE.Color("#a8afbe"),
-    signal: new THREE.Color("#6b7ba6"),
-    highlight: new THREE.Color("#d4dae5"),
+    base: new THREE.Color("#5c6683"),
+    deep: new THREE.Color("#3d445c"),
+    signal: new THREE.Color("#2b4894"),
+    highlight: new THREE.Color("#78829e"),
   },
-  halo: new THREE.Color("#5c78c4"),
-  dust: new THREE.Color("#7186b8"),
-  // Normal-blended points stack rather than saturate; the field needs far less.
-  dustOpacity: 0.55,
+  halo: new THREE.Color("#4a63b4"),
+  dust: new THREE.Color("#55689c"),
+  // Normal-blended points stack rather than saturate, but they still have to
+  // clear the paper to exist at all.
+  dustOpacity: 0.8,
 
-  node: new THREE.Color("#4a6fd8"),
+  node: new THREE.Color("#3558bd"),
   nodeCore: new THREE.Color("#12224f"),
-  link: new THREE.Color("#3a5fc0"),
-  linkOpacity: 0.24,
+  link: new THREE.Color("#2f4f9e"),
+  linkOpacity: 0.38,
 };
 
 export function scenePalette(theme: Theme): ScenePalette {
