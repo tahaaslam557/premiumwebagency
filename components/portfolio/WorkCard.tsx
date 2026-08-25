@@ -30,7 +30,16 @@ export function WorkCard({ image, code, caption, priority = false, className }: 
     <figure
       className={cn(
         "group/card relative overflow-hidden rounded-xl border border-line bg-elevate",
-        "[--card-h:20rem] sm:[--card-h:24rem] lg:[--card-h:24rem] xl:[--card-h:28rem]",
+        // Below lg the section scrolls normally and the card can be whatever
+        // height reads best. From lg it lives inside a pinned, viewport-tall
+        // track, and height — not width — becomes the scarce dimension: a
+        // 1366×768 laptop is *wide* enough for the 28rem card and nowhere near
+        // tall enough for it, which is what used to drive the panels up into
+        // the section header. `--track-reserve` is published by that track;
+        // whatever it does not claim is the most a card may be.
+        "[--card-h:20rem] sm:[--card-h:24rem]",
+        "lg:[--card-h:min(24rem,calc(100svh-var(--track-reserve,30rem)))]",
+        "xl:[--card-h:min(28rem,calc(100svh-var(--track-reserve,30rem)))]",
         className,
       )}
       data-cursor="view"
