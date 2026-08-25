@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono, Michroma, Quicksand } from "next/font/google";
 import "./globals.css";
 
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
@@ -10,16 +10,29 @@ import { Preloader } from "@/components/hero/Preloader";
 import { DEFAULT_THEME, NO_FLASH_SCRIPT, THEME_COLOR } from "@/lib/theme";
 import { contact, reputation, site } from "@/data/site";
 
-const display = Geist({
+// Each face publishes a `-src` variable rather than the role name itself.
+// The roles are composed in globals.css, where the fallback stack lives — a
+// font declaring `--font-display` directly would collide with the `@theme`
+// entry of the same name, and the fallbacks after it would never be reachable.
+const display = Michroma({
   subsets: ["latin"],
-  variable: "--font-display",
+  variable: "--font-display-src",
+  display: "swap",
+  // Michroma ships one weight and only one. Asking for more silently gets you
+  // synthesised bold, which on a face this wide smears the counters shut.
+  weight: ["400"],
+});
+
+const sans = Quicksand({
+  subsets: ["latin"],
+  variable: "--font-sans-src",
   display: "swap",
   weight: ["300", "400", "500", "600", "700"],
 });
 
 const mono = Geist_Mono({
   subsets: ["latin"],
-  variable: "--font-mono",
+  variable: "--font-mono-src",
   display: "swap",
   weight: ["400", "500"],
 });
@@ -120,7 +133,7 @@ export default function RootLayout({
       lang="en"
       data-theme={DEFAULT_THEME}
       suppressHydrationWarning
-      className={`${display.variable} ${mono.variable}`}
+      className={`${display.variable} ${sans.variable} ${mono.variable}`}
     >
       <head>
         {/* Runs before anything paints: reads the stored choice and falls
