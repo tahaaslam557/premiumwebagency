@@ -24,6 +24,17 @@ const DRAG = { k: 0.34, damp: 0.62 };
 // Lighter damping than this reads as rubber; heavier kills the snap outright.
 const RELEASE = { k: 0.17, damp: 0.7 };
 
+/**
+ * The spring integrates in fixed steps, not in frames. A per-frame spring is
+ * really a per-refresh-rate spring: the same constants snap in half the time
+ * on a 120Hz laptop and drag out to seconds on anything struggling. The cord
+ * has to feel the same everywhere, so the loop accumulates real time and
+ * spends it in 60Hz steps.
+ */
+const STEP = 1 / 60;
+/** Never replay more than this after a tab-switch or a long frame. */
+const MAX_CATCHUP = 0.25;
+
 /** How far the cord leans toward an approaching hand. */
 const HOVER_LIFT = 8;
 
@@ -98,6 +109,7 @@ export function LampThemeToggle({ condensed = false, hidden = false }: LampTheme
 
   const frameRef = useRef(0);
   const runningRef = useRef(false);
+  const clockRef = useRef({ last: 0, debt: 0 });
   const draggingRef = useRef(false);
   const armedRef = useRef(false);
   const hoverRef = useRef(false);
@@ -193,17 +205,27 @@ export function LampThemeToggle({ condensed = false, hidden = false }: LampTheme
     return progress;
   }, []);
 
-  const tick = useCallback(() => {
+  const tick = useCallback((now: number) => {
     const s = sim.current;
     const spring = s.mode === "drag" ? DRAG : RELEASE;
+    const clock = clockRef.current;
 
-    s.pullV += (s.targetPull - s.pull) * spring.k;
-    s.pullV *= spring.damp;
-    s.pull += s.pullV;
+    // First frame of a run has no previous timestamp to measure against, so it
+    // is worth exactly one step rather than whatever the clock happened to say.
+    const elapsed = clock.last ? Math.min((now - clock.last) / 1000, MAX_CATCHUP) : STEP;
+    clock.last = now;
+    clock.debt += elapsed;
 
-    s.sideV += (s.targetSide - s.side) * spring.k;
-    s.sideV *= spring.damp;
-    s.side += s.sideV;
+    while (clock.debt >= STEP) {
+      clock.debt -= STEP;
+      s.pullV += (s.targetPull - s.pull) * spring.k;
+      s.pullV *= spring.damp;
+      s.pull += s.pullV;
+
+      s.sideV += (s.targetSide - s.side) * spring.k;
+      s.sideV *= spring.damp;
+      s.side += s.sideV;
+    }
 
     const progress = draw();
 
@@ -245,6 +267,10 @@ export function LampThemeToggle({ condensed = false, hidden = false }: LampTheme
   const run = useCallback(() => {
     if (runningRef.current || reduced) return;
     runningRef.current = true;
+    // A stopped loop has no elapsed time to account for; start the clock fresh
+    // so a cord that has been at rest for a minute does not owe a minute.
+    clockRef.current.last = 0;
+    clockRef.current.debt = 0;
     frameRef.current = requestAnimationFrame(tick);
   }, [reduced, tick]);
 
