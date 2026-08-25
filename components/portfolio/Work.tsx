@@ -68,7 +68,7 @@ export function Work() {
       // how tall they are allowed to be. One number, one threshold — the
       // header tightens and the cards shrink at the same moment, so the two
       // can never disagree and collide.
-      className="relative border-t border-line bg-void [--track-reserve:31.5rem] lg:flex lg:h-[100svh] lg:flex-col lg:overflow-hidden [@media(max-height:900px)]:[--track-reserve:30.5rem]"
+      className="relative border-t border-line bg-void [--track-reserve:30rem] lg:flex lg:h-[100svh] lg:flex-col lg:overflow-hidden [@media(max-height:900px)]:[--track-reserve:28.5rem]"
       aria-labelledby="work-heading"
     >
       {/* Once the track is pinned, every pixel this header spends is a pixel

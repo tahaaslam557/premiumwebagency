@@ -36,23 +36,14 @@
      read one step off the background. */
   --color-tint: #ffffff;
 
-  /* Composed from the `-src` variables next/font puts on <html>. These used
-     to read `var(--font-display), ...` — a self-reference, which is invalid at
-     computed-value time. `--font-sans` had no provider at all, so it resolved
-     to nothing and body text quietly fell through to whatever sans the OS
-     happened to default to. */
-  --font-display: var(--font-display-src), "Trebuchet MS", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: var(--font-sans-src), "Century Gothic", ui-rounded, ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-mono-src), ui-monospace, "SFMono-Regular", monospace;
+  --font-display: var(--font-display), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-sans), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, "SFMono-Regular", monospace;
 
-  /* Scaled to Michroma. A display size is really a *width* budget, and
-     Michroma sets roughly half again as wide as the grotesque these were
-     picked for — at the old 13vw the hero headline broke to two lines and ran
-     into the object beside it. Same optical presence, smaller numbers. */
-  --text-display-xl: clamp(2.5rem, 9.5vw, 9.5rem);
-  --text-display-lg: clamp(1.9rem, 6.2vw, 6rem);
-  --text-display-md: clamp(1.5rem, 4.2vw, 3.5rem);
-  --text-display-sm: clamp(1.15rem, 2.8vw, 2.1rem);
+  --text-display-xl: clamp(3.5rem, 13vw, 13rem);
+  --text-display-lg: clamp(2.75rem, 9vw, 8.5rem);
+  --text-display-md: clamp(2.25rem, 6vw, 5rem);
+  --text-display-sm: clamp(1.75rem, 4vw, 3rem);
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out-quint: cubic-bezier(0.83, 0, 0.17, 1);
@@ -196,18 +187,11 @@ html.lenis body {
   color: var(--color-mute);
 }
 
-/* Tuned for Michroma, which is a wide squarish face rather than the tight
-   grotesque this used to be set in. The old -0.045em tracking was pulling
-   words into each other — "AI IS" arrived as "AIIS" — because Michroma is
-   drawn with the sidebearings it needs already built in; there is nothing
-   spare to take out. Weight is 400 because that is the only weight it has,
-   and asking for 500 buys a synthesised bold that fills in the counters. */
 @utility display {
   font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: 0;
-  word-spacing: 0.06em;
-  line-height: 1.02;
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 0.86;
   text-wrap: balance;
 }
 

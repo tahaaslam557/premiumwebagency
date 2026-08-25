@@ -106,7 +106,7 @@ export function Hero() {
           <span className="sr-only">We are AI.</span>
           <span aria-hidden="true" className="block">
             {HEADLINE.map((word, index) => (
-              <span key={word} className="block overflow-hidden pb-[0.1em] sm:inline-block sm:pr-[0.3em]">
+              <span key={word} className="block overflow-hidden pb-[0.1em] sm:inline-block sm:pr-[0.22em]">
                 <motion.span
                   data-reveal
                   className="block will-change-transform"
