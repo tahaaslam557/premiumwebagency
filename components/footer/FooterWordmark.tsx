@@ -1,19 +1,30 @@
 "use client";
 
+import { Reveal } from "@/components/motion/Reveal";
 import { Marquee } from "@/components/ui/Marquee";
 import { site } from "@/data/site";
 
+/** "Premium Web" / "Agency" — split once, at module scope. */
+const words = site.name.trim().split(/\s+/);
+const lead = words.slice(0, -1).join(" ") || site.name;
+const tail = words.length > 1 ? words[words.length - 1] : "";
+
 /**
- * The name, once, at the bottom of everything — full-bleed and moving.
+ * The name, at display scale, running as a ribbon under everything else.
  *
- * Sized in `vw` so it always spans the viewport rather than being a fixed
- * size that happens to fit one screen. Painted with the same top-to-bottom
- * type gradient the hero uses, so the letterforms fade as they descend.
+ * The lockup is deliberately two-tone: the opening words are filled with the
+ * same top-to-bottom type gradient the hero uses, and the last word is drawn
+ * as an outline. That gives the eye a shape to hold onto — a solid mass and a
+ * ghost — rather than one very long undifferentiated slab of letters, and it
+ * gives the hover somewhere to land: the outline warms to the accent while
+ * the ribbon holds still.
  *
- * The leading leaves room for the descenders in "g" and "y". A tighter line
- * box cropped them mid-curve, which reads as a clipping bug rather than as a
- * deliberate crop — and this is the company's own name, which is the last
- * place to look accidentally broken.
+ * The rail is masked at both edges rather than hard-cut by `overflow: hidden`,
+ * so letters dissolve into the page instead of ending mid-curve, and a small
+ * accent mark separates each repetition so the loop reads as a decision.
+ *
+ * Sizing, the stroke weight, the mark and the bloom all live in `footer.css`
+ * next to each other — see the note there for why 9vw is the ceiling.
  *
  * Motion comes from <Marquee>, so `prefers-reduced-motion` stops it outright
  * through the rule in globals.css rather than needing a second mechanism here.
@@ -21,23 +32,34 @@ import { site } from "@/data/site";
  */
 export function FooterWordmark() {
   return (
-    <div
-      className="relative select-none overflow-hidden pt-12 pb-2"
+    <Reveal
+      distance={36}
+      /* Not the shared `inView` config. That one holds a -12% bottom margin so
+         mid-page sections do not fire while still half a screen away, but this
+         is the last element in the document: the bottom 12% of the viewport is
+         the only place it ever sits, and its own entrance offset pushes it
+         further into that band, so the shared config can never trigger it. */
+      viewport={{ once: true }}
+      className="wordmark relative select-none pt-14 pb-3"
       aria-hidden="true"
     >
+      <div className="wordmark-glow" />
+
       <Marquee
         pauseOnHover
         repeat={3}
-        className="[--duration:34s] [--gap:0.2em]"
+        className="wordmark-rail relative [--duration:42s] [--gap:0.14em]"
       >
-        <span className="display block whitespace-nowrap text-[12vw] leading-[1.06] text-gradient-bone">
-          {site.name}
+        <span className="wordmark-lockup">
+          <span className="text-gradient-bone">{lead}</span>
+          {tail ? <span className="wordmark-outline">{tail}</span> : null}
+          <span className="wordmark-mark" />
         </span>
       </Marquee>
 
       {/* The wordmark is decoration; the readable name is already in the
           copyright line above. One accessible copy, not two. */}
       <span className="sr-only">{site.name}</span>
-    </div>
+    </Reveal>
   );
 }

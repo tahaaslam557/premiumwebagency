@@ -1,0 +1,90 @@
+/* ------------------------------------------------------------------
+   Footer wordmark
+   The company name, set once at display scale and run as a ribbon under
+   everything else. Kept here rather than in arbitrary utilities because the
+   treatment needs a text stroke, a mask and a hover transition, and those
+   read far better as one scoped block than as a wall of bracket classes.
+   Every colour is a role token, so both themes come free.
+------------------------------------------------------------------- */
+.wordmark {
+  /* Bounded by legibility, not taste: at this typeface one lockup measures
+     roughly 9.9x its font size once the gaps and the mark are counted, so
+     anything much above 10vw makes the name wider than the screen and the
+     ribbon can only ever show a fragment of it. 9vw lands one whole lockup at
+     ~90% of the viewport, leaving the gap before the next one visible. */
+  font-size: 9vw;
+  line-height: 1.06;
+}
+
+/* Dissolve at both edges instead of being chopped by `overflow: hidden`.
+   A hard cut mid-letter reads as a clipping bug; a fade reads as a ribbon
+   passing through. */
+.wordmark-rail {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+
+/* The display face is restated here rather than borrowing the `display`
+   utility: that utility also carries `line-height: 0.86`, which crops the
+   descenders in "g" and "y" at this scale, and relying on utility ordering to
+   beat it is the kind of thing that quietly breaks on a Tailwind upgrade. */
+.wordmark-lockup {
+  display: flex;
+  flex: none;
+  align-items: baseline;
+  gap: 0.18em;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 1.06;
+}
+
+/* "Agency" is drawn rather than filled, so the eye reads the name as one
+   object with two weights instead of one long undifferentiated slab. The
+   stroke is set in `em` so it thickens with the type and never turns into a
+   hairline at 1920 or a smudge at 390. */
+.wordmark-outline {
+  color: transparent;
+  -webkit-text-stroke: 0.014em var(--color-faint);
+  transition: -webkit-text-stroke-color 500ms var(--ease-out-expo);
+}
+
+.wordmark:hover .wordmark-outline {
+  -webkit-text-stroke-color: var(--color-signal);
+}
+
+/* The turn marker between repetitions. Without it the ribbon reads as a
+   sentence that has lost its spacing; with it, the repeat is obviously
+   deliberate. */
+.wordmark-mark {
+  align-self: center;
+  flex: none;
+  width: 0.075em;
+  height: 0.075em;
+  margin-inline: 0.06em;
+  border-radius: 0.012em;
+  rotate: 45deg;
+  background: var(--color-signal);
+  opacity: 0.6;
+}
+
+/* A low bloom rising off the bottom edge, so the type looks lit from below
+   rather than pasted on. Paper takes far less of it than the void does. */
+.wordmark-glow {
+  position: absolute;
+  inset-inline: 0;
+  bottom: -35%;
+  height: 130%;
+  pointer-events: none;
+  background: radial-gradient(
+    58% 100% at 50% 100%,
+    color-mix(in oklab, var(--color-signal) 24%, transparent),
+    transparent 72%
+  );
+  opacity: 0.55;
+}
+
+:root[data-theme="light"] .wordmark-glow {
+  opacity: 0.28;
+}
