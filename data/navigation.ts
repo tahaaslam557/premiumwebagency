@@ -17,6 +17,11 @@ export const navigation: NavItem[] = [
  * Every service link here resolves to a real route under /services.
  * The label is the join key with `data/service-pages.ts` — a label with no
  * matching page is a build-time failure there, not a silent 404 here.
+ *
+ * The last three in "Apps & AI" are the top-level routes rather than services.
+ * Pricing and Contact used to be `#pricing` and `#contact`, which only worked
+ * from the homepage and dumped you at the top of it from anywhere else; they
+ * are real pages now. The homepage's own section nav still uses the anchors.
  */
 export const footerColumns = [
   {
@@ -71,8 +76,9 @@ export const footerColumns = [
       { label: "AI Product Integration", href: "/services/ai-product-integration" },
       { label: "AI Agents & Automation", href: "/services/ai-agents-automation" },
       { label: "Intelligent Workflows", href: "/services/intelligent-workflows" },
-      { label: "Pricing", href: "#pricing" },
-      { label: "Contact", href: "#contact" },
+      { label: "All Services", href: "/services" },
+      { label: "Pricing", href: "/pricing" },
+      { label: "Contact", href: "/contact" },
     ],
   },
 ];

@@ -14,6 +14,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 1,
     },
+    // The three top-level routes.
+    ...["/services", "/pricing", "/contact"].map((path) => ({
+      url: `${site.url}${path}`,
+      lastModified,
+      changeFrequency: "weekly" as const,
+      priority: 0.9,
+    })),
     // The service routes. Read from the same list the pages are generated
     // from, so a route cannot exist and go unlisted.
     ...servicePages.map((service) => ({

@@ -79,10 +79,10 @@ export function ServicePage({ service }: { service: Service }) {
             </Reveal>
 
             <Reveal delay={0.2} className="mt-10 flex flex-wrap items-center gap-3">
-              <ButtonLink href="/#contact" size="lg">
+              <ButtonLink href="/contact" size="lg">
                 Start a project
               </ButtonLink>
-              <ButtonLink href="/#pricing" variant="line" size="lg">
+              <ButtonLink href="/pricing" variant="line" size="lg">
                 See pricing
               </ButtonLink>
             </Reveal>
@@ -364,7 +364,7 @@ export function ServicePage({ service }: { service: Service }) {
                   </Reveal>
                 </div>
                 <Reveal delay={0.16} className="flex flex-wrap gap-3">
-                  <ButtonLink href="/#contact" size="lg">
+                  <ButtonLink href="/contact" size="lg">
                     Start a project
                   </ButtonLink>
                   <ButtonLink href={contact.phoneHref} variant="line" size="lg">
