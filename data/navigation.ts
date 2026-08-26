@@ -4,13 +4,23 @@ export type NavItem = {
   index: string;
 };
 
+/**
+ * The primary nav, in both the header and the mobile menu.
+ *
+ * Two kinds of entry live here. The first four are homepage sections, read as
+ * anchors and rewritten to `/#section` from anywhere else. The last two are
+ * real routes: they used to be `#pricing` and `#contact`, which scrolled on the
+ * homepage and dumped you at the top of it from every other page. Anything
+ * rendering this list has to handle both — see <NavAnchor>, which is the only
+ * place that decision is made.
+ */
 export const navigation: NavItem[] = [
   { label: "Intelligence", href: "#intelligence", index: "01" },
   { label: "Capabilities", href: "#capabilities", index: "02" },
   { label: "Work", href: "#work", index: "03" },
   { label: "Method", href: "#method", index: "04" },
-  { label: "Pricing", href: "#pricing", index: "05" },
-  { label: "Contact", href: "#contact", index: "06" },
+  { label: "Pricing", href: "/pricing", index: "05" },
+  { label: "Contact", href: "/contact", index: "06" },
 ];
 
 /**

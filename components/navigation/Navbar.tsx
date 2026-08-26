@@ -8,6 +8,7 @@ import { motion } from "motion/react";
 import { ButtonLink } from "@/components/ui/Button";
 import { LampThemeToggle } from "@/components/theme/LampThemeToggle";
 import { MobileMenu } from "./MobileMenu";
+import { NavAnchor } from "./NavAnchor";
 import { EASE } from "@/lib/constants";
 import { useScrollY } from "@/lib/hooks";
 import { cn, sectionHref } from "@/lib/utils";
@@ -23,12 +24,25 @@ export function Navbar() {
   const pathname = usePathname();
   const scrollY = useScrollY();
   const [open, setOpen] = useState(false);
-  const [active, setActive] = useState<string>("");
+  const [activeSection, setActiveSection] = useState<string>("");
 
   const condensed = scrollY > 40;
 
+  /**
+   * An entry reads as current for one of two reasons: its section is the one
+   * under the fold, or its route is the page you are standing on. Pricing and
+   * Contact are routes now, so scroll position alone can no longer answer this.
+   */
+  const active =
+    navigation.find((item) =>
+      item.href.startsWith("#") ? item.href === activeSection : item.href === pathname,
+    )?.href ?? "";
+
   useEffect(() => {
     const sections = navigation
+      // Only the anchor entries name an element on this page. Handing
+      // "/pricing" to querySelector throws — it is not a valid selector.
+      .filter((item) => item.href.startsWith("#"))
       .map((item) => document.querySelector(item.href))
       .filter((node): node is Element => Boolean(node));
     if (!sections.length) return;
@@ -38,7 +52,7 @@ export function Navbar() {
         const visible = entries
           .filter((entry) => entry.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible?.target.id) setActive(`#${visible.target.id}`);
+        if (visible?.target.id) setActiveSection(`#${visible.target.id}`);
       },
       { rootMargin: "-45% 0px -45% 0px", threshold: [0, 0.25, 0.5] },
     );
@@ -107,9 +121,9 @@ export function Navbar() {
 
           <nav aria-label="Primary" className="hidden items-center gap-1 lg:flex">
             {navigation.map((item) => (
-              <a
+              <NavAnchor
                 key={item.href}
-                href={sectionHref(item.href, pathname)}
+                href={item.href}
                 className={cn(
                   "group relative rounded-full px-4 py-2 text-sm transition-colors duration-300",
                   active === item.href ? "text-bone" : "text-mute hover:text-bone",
@@ -123,7 +137,7 @@ export function Navbar() {
                   />
                 ) : null}
                 <span className="relative">{item.label}</span>
-              </a>
+              </NavAnchor>
             ))}
           </nav>
 
@@ -143,7 +157,11 @@ export function Navbar() {
               {contact.phone}
             </a>
 
-            <ButtonLink href={sectionHref("#contact", pathname)} size="sm" className="hidden sm:inline-flex">
+            {/* The route, not `#contact`. The header is global chrome: it
+                should land on the same place from every page, and that page
+                carries the offices, the second line and what happens next.
+                In-page CTAs still scroll to the form on the page they are on. */}
+            <ButtonLink href="/contact" size="sm" className="hidden sm:inline-flex">
               Start project
             </ButtonLink>
 

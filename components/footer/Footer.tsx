@@ -2,20 +2,17 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { FooterWordmark } from "./FooterWordmark";
 import { MaskText } from "@/components/motion/MaskText";
+import { NavAnchor } from "@/components/navigation/NavAnchor";
 import { Reveal } from "@/components/motion/Reveal";
 import { footerColumns, legalLinks, navigation } from "@/data/navigation";
 import { contact, site, socials } from "@/data/site";
-import { sectionHref } from "@/lib/utils";
 
 /** Final system screen: statement, index, contact, legal, live status. */
 export function Footer() {
-  const pathname = usePathname();
-
   return (
     <footer className="relative overflow-hidden border-t border-line bg-void">
       <div className="page pt-24 lg:pt-32">
@@ -90,12 +87,12 @@ export function Footer() {
                 <ul className="mt-5 flex flex-col gap-2.5">
                   {column.links.map((link) => (
                     <li key={link.label}>
-                      <a
-                        href={sectionHref(link.href, pathname)}
+                      <NavAnchor
+                        href={link.href}
                         className="text-sm text-mute transition-colors hover:text-bone"
                       >
                         {link.label}
-                      </a>
+                      </NavAnchor>
                     </li>
                   ))}
                 </ul>
@@ -109,13 +106,13 @@ export function Footer() {
         <div className="grid gap-8 py-10 lg:grid-cols-[1fr_auto] lg:items-center">
           <nav aria-label="Sections" className="flex flex-wrap gap-x-6 gap-y-2">
             {navigation.map((item) => (
-              <a
+              <NavAnchor
                 key={item.href}
-                href={sectionHref(item.href, pathname)}
+                href={item.href}
                 className="label transition-colors hover:!text-bone"
               >
                 <span className="!text-faint">{item.index}</span> {item.label}
-              </a>
+              </NavAnchor>
             ))}
           </nav>
 

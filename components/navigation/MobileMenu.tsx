@@ -1,11 +1,10 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 
 import { EASE } from "@/lib/constants";
+import { NavAnchor } from "./NavAnchor";
 import { useScrollLock } from "@/lib/hooks";
-import { sectionHref } from "@/lib/utils";
 import { navigation } from "@/data/navigation";
 import { contact } from "@/data/site";
 
@@ -15,7 +14,6 @@ type MobileMenuProps = {
 };
 
 export function MobileMenu({ open, onClose }: MobileMenuProps) {
-  const pathname = usePathname();
   useScrollLock(open);
 
   return (
@@ -36,22 +34,29 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
             aria-label="Primary"
             className="page relative flex flex-1 flex-col justify-center gap-1 pt-[var(--nav-h)]"
           >
+            {/* The entrance animates a wrapper rather than the link itself:
+                half these entries are routes now and render through <Link>,
+                which motion cannot animate directly. The anchor still fills
+                the row, so nothing about the target area changes. */}
             {navigation.map((item, index) => (
-              <motion.a
+              <motion.div
                 key={item.href}
-                href={sectionHref(item.href, pathname)}
-                onClick={onClose}
-                className="group flex items-baseline gap-4 border-b border-line/60 py-4"
                 initial={{ opacity: 0, y: 26 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 12, transition: { duration: 0.2 } }}
                 transition={{ duration: 0.7, delay: 0.14 + index * 0.055, ease: EASE.outExpo }}
               >
-                <span className="label !text-faint">{item.index}</span>
-                <span className="display text-[length:var(--text-display-sm)] text-bone transition-colors group-hover:text-signal-bright">
-                  {item.label}
-                </span>
-              </motion.a>
+                <NavAnchor
+                  href={item.href}
+                  onClick={onClose}
+                  className="group flex items-baseline gap-4 border-b border-line/60 py-4"
+                >
+                  <span className="label !text-faint">{item.index}</span>
+                  <span className="display text-[length:var(--text-display-sm)] text-bone transition-colors group-hover:text-signal-bright">
+                    {item.label}
+                  </span>
+                </NavAnchor>
+              </motion.div>
             ))}
           </nav>
 
