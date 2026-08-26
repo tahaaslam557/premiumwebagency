@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { FooterWordmark } from "./FooterWordmark";
 import { MaskText } from "@/components/motion/MaskText";
 import { Reveal } from "@/components/motion/Reveal";
 import { footerColumns, legalLinks, navigation } from "@/data/navigation";
@@ -150,6 +151,10 @@ export function Footer() {
           <LiveStatus />
         </Reveal>
       </div>
+
+      {/* Outside `.page` on purpose: the wordmark runs the full width of the
+          viewport, not the width of the content grid. */}
+      <FooterWordmark />
     </footer>
   );
 }

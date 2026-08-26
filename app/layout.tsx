@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
@@ -15,6 +16,39 @@ const display = Geist({
   variable: "--font-display",
   display: "swap",
   weight: ["300", "400", "500", "600", "700"],
+});
+
+/**
+ * Body copy — everything that is not a display heading or a mono label.
+ *
+ * Self-hosted rather than pulled from `next/font/google`, which does not know
+ * this family: Valley Sans is a recent addition and is not in the font list
+ * Next 16.3.2 ships. The files are the same OFL-licensed woff2 Google serves,
+ * so hosting them here costs one fewer third-party connection on first paint.
+ *
+ * One variable file per style covers the whole 100–900 axis, which is the
+ * reason to take the variable cut: `font-medium` on a button and `strong` in
+ * the legal prose get real weights rather than a synthesised bold.
+ *
+ * Latin subset only. The site is en-US and the coverage includes the em dash,
+ * curly quotes and ellipsis the copy actually uses; a stray latin-ext glyph
+ * would fall back for that character alone.
+ */
+const sans = localFont({
+  src: [
+    {
+      path: "./fonts/valley-sans-variable.woff2",
+      weight: "100 900",
+      style: "normal",
+    },
+    {
+      path: "./fonts/valley-sans-variable-italic.woff2",
+      weight: "100 900",
+      style: "italic",
+    },
+  ],
+  variable: "--font-sans",
+  display: "swap",
 });
 
 const mono = Geist_Mono({
@@ -120,7 +154,7 @@ export default function RootLayout({
       lang="en"
       data-theme={DEFAULT_THEME}
       suppressHydrationWarning
-      className={`${display.variable} ${mono.variable}`}
+      className={`${display.variable} ${sans.variable} ${mono.variable}`}
     >
       <head>
         {/* Runs before anything paints: reads the stored choice and falls
