@@ -1,36 +1,33 @@
 /* ------------------------------------------------------------------
    Footer wordmark
-   The company name, set once at display scale and run as a ribbon under
-   everything else. Kept here rather than in arbitrary utilities because the
-   treatment needs a text stroke, a mask and a hover transition, and those
-   read far better as one scoped block than as a wall of bracket classes.
-   Every colour is a role token, so both themes come free.
+   The company name, once, at the foot of the page — set to span the width
+   of the footer grid exactly rather than at a viewport-unit size that
+   happens to look right on one screen.
+
+   The final size is written by the component, which measures the rendered
+   text and scales it to the space it has. Everything below is the part that
+   does not depend on measurement: the face, the two-tone treatment, and the
+   fallback size used before the first measurement lands (and if scripting
+   never runs at all).
 ------------------------------------------------------------------- */
 .wordmark {
-  /* Bounded by legibility, not taste: at this typeface one lockup measures
-     roughly 9.9x its font size once the gaps and the mark are counted, so
-     anything much above 10vw makes the name wider than the screen and the
-     ribbon can only ever show a fragment of it. 9vw lands one whole lockup at
-     ~90% of the viewport, leaving the gap before the next one visible. */
-  font-size: 9vw;
-  line-height: 1.06;
-}
+  /* Aligned to the footer grid rather than bled to the window edge, so the
+     name reads as the last row of the layout instead of a banner stuck
+     underneath it. */
+  padding-inline: var(--gutter);
 
-/* Dissolve at both edges instead of being chopped by `overflow: hidden`.
-   A hard cut mid-letter reads as a clipping bug; a fade reads as a ribbon
-   passing through. */
-.wordmark-rail {
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  /* `clip` rather than `hidden`: it stops a mid-load overflow from ever
+     creating a horizontal scrollbar without also cropping the descenders in
+     "g" and "y", which hang below the line box. */
+  overflow-x: clip;
 }
 
 /* The display face is restated here rather than borrowing the `display`
-   utility: that utility also carries `line-height: 0.86`, which crops the
-   descenders in "g" and "y" at this scale, and relying on utility ordering to
-   beat it is the kind of thing that quietly breaks on a Tailwind upgrade. */
+   utility: that utility carries `line-height: 0.86`, which crops those same
+   descenders at this scale, and relying on utility ordering to beat it is
+   the kind of thing that quietly breaks on a Tailwind upgrade. */
 .wordmark-lockup {
-  display: flex;
-  flex: none;
+  display: inline-flex;
   align-items: baseline;
   gap: 0.18em;
   white-space: nowrap;
@@ -38,6 +35,53 @@
   font-weight: 500;
   letter-spacing: -0.045em;
   line-height: 1.06;
+
+  /* Replaced with a measured pixel value on mount. Only ever visible for the
+     first frame, or to a reader with scripting off — so it is deliberately a
+     size that cannot overflow rather than one that fills the width. */
+  font-size: 8vw;
+}
+
+/* The opening words carry the same top-to-bottom type gradient the hero
+   uses, with a slow accent sheen travelling across it. Both layers are
+   clipped to the glyphs, so the sheen lights the letters rather than the
+   box behind them. */
+.wordmark-lead {
+  background-image:
+    linear-gradient(
+      100deg,
+      transparent 42%,
+      color-mix(in oklab, var(--color-signal) 60%, transparent) 50%,
+      transparent 58%
+    ),
+    linear-gradient(
+      180deg,
+      var(--grad-top) 0%,
+      var(--grad-mid) 62%,
+      var(--grad-end) 100%
+    );
+  background-size: 260% 100%, 100% 100%;
+  background-position: -80% 0, 0 0;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .wordmark-lead {
+    animation: wordmark-sheen 9s var(--ease-in-out-quint) infinite;
+  }
+}
+
+@keyframes wordmark-sheen {
+  0% {
+    background-position: -80% 0, 0 0;
+  }
+  55%,
+  100% {
+    background-position: 180% 0, 0 0;
+  }
 }
 
 /* "Agency" is drawn rather than filled, so the eye reads the name as one
@@ -52,21 +96,6 @@
 
 .wordmark:hover .wordmark-outline {
   -webkit-text-stroke-color: var(--color-signal);
-}
-
-/* The turn marker between repetitions. Without it the ribbon reads as a
-   sentence that has lost its spacing; with it, the repeat is obviously
-   deliberate. */
-.wordmark-mark {
-  align-self: center;
-  flex: none;
-  width: 0.075em;
-  height: 0.075em;
-  margin-inline: 0.06em;
-  border-radius: 0.012em;
-  rotate: 45deg;
-  background: var(--color-signal);
-  opacity: 0.6;
 }
 
 /* A low bloom rising off the bottom edge, so the type looks lit from below
