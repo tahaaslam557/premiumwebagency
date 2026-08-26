@@ -267,6 +267,131 @@ html.lenis body {
 /* ------------------------------------------------------------------
    Film grain — one fixed layer, GPU-cheap, never intercepts pointers.
 ------------------------------------------------------------------- */
+/* ------------------------------------------------------------------
+   Ambient glow
+   Three accent blooms drifting behind everything, so the page reads as lit
+   rather than printed.
+
+   It has to be an overlay, not a backdrop: every section paints an opaque
+   `bg-void`, so a layer underneath them would never be seen. Which makes the
+   blend mode the whole trick. `screen` only ever lightens, and it lightens
+   dark pixels far more than light ones — so on the void the bloom lands on
+   the ground and leaves bone-coloured type essentially untouched. Light wants
+   the exact mirror: `multiply` only ever darkens, and a pale wash over paper
+   leaves near-black type where it was. Either way the glow never costs
+   legibility, which a flat low-opacity veil would.
+
+   z-index sits under the grain (90) and the header (100) and above the page,
+   which is the only band where an overlay can be ambient rather than in
+   the way.
+
+   Deliberately filter-free. `filter: blur()` on three viewport-sized elements
+   is the most expensive thing that could be on this page; a radial gradient
+   with a soft stop is free and, at this scale, indistinguishable.
+------------------------------------------------------------------- */
+.glow-field {
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+  pointer-events: none;
+  overflow: hidden;
+  mix-blend-mode: screen;
+  /* Screen over near-black lands at roughly `orb x opacity`, so these two
+     numbers are the whole calibration. Pitched low on purpose: the site is a
+     near-black void with blue accents, and a bloom bright enough to tint the
+     whole viewport stops being light in a room and becomes a navy theme. */
+  opacity: 0.34;
+  --glow-a: color-mix(in oklab, var(--color-signal) 34%, black);
+  --glow-b: color-mix(in oklab, var(--color-signal-bright) 17%, black);
+  --glow-c: color-mix(in oklab, var(--color-signal-deep) 44%, black);
+}
+
+:root[data-theme="light"] .glow-field {
+  mix-blend-mode: multiply;
+  opacity: 0.62;
+  /* Mixed toward white, not toward transparent: multiply against a saturated
+     blue would bruise the paper rather than tint it. */
+  --glow-a: color-mix(in oklab, var(--color-signal) 11%, white);
+  --glow-b: color-mix(in oklab, var(--color-signal-bright) 8%, white);
+  --glow-c: color-mix(in oklab, var(--color-signal) 6%, white);
+}
+
+.glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+.glow-orb-a {
+  top: -28vmax;
+  left: -18vmax;
+  width: 66vmax;
+  height: 66vmax;
+  background: radial-gradient(circle at 50% 50%, var(--glow-a) 0%, transparent 58%);
+  animation: glow-drift-a 46s var(--ease-in-out-quint) infinite;
+}
+
+.glow-orb-b {
+  top: 18vmax;
+  right: -30vmax;
+  width: 58vmax;
+  height: 58vmax;
+  background: radial-gradient(circle at 50% 50%, var(--glow-b) 0%, transparent 56%);
+  animation: glow-drift-b 61s var(--ease-in-out-quint) infinite;
+}
+
+.glow-orb-c {
+  bottom: -34vmax;
+  left: 22vmax;
+  width: 72vmax;
+  height: 72vmax;
+  background: radial-gradient(circle at 50% 50%, var(--glow-c) 0%, transparent 60%);
+  animation: glow-drift-c 74s var(--ease-in-out-quint) infinite;
+}
+
+/* A viewport-sized blend layer is re-composited whenever anything under it
+   changes, and an animated one every frame on top of that. Phones already pay
+   for smooth scroll and the grain, so on small screens the blooms hold still:
+   the light stays, the per-frame cost does not. */
+@media (max-width: 48rem) {
+  .glow-orb {
+    animation: none;
+    will-change: auto;
+  }
+}
+
+/* Transform only — nothing here touches layout or paint, so the whole field
+   stays on the compositor. */
+@keyframes glow-drift-a {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(14vmax, 9vmax, 0) scale(1.14);
+  }
+}
+
+@keyframes glow-drift-b {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1.08);
+  }
+  50% {
+    transform: translate3d(-16vmax, 12vmax, 0) scale(0.92);
+  }
+}
+
+@keyframes glow-drift-c {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(11vmax, -13vmax, 0) scale(1.1);
+  }
+}
+
 .grain {
   position: fixed;
   inset: -120%;
@@ -324,6 +449,14 @@ html.lenis body {
      A marquee has to be stopped outright, not sped up. */
   .animate-marquee,
   .animate-marquee-vertical {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  /* Same reasoning, opposite outcome: the blooms are still wanted, they just
+     stop drifting. Holding at the start of the cycle is the composition they
+     were positioned for. */
+  .glow-orb {
     animation: none !important;
     transform: none !important;
   }

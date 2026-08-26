@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 
+import { AmbientGlow } from "@/components/backgrounds/AmbientGlow";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { SmoothScroll } from "@/components/motion/SmoothScroll";
 import { Cursor } from "@/components/ui/Cursor";
@@ -201,6 +202,7 @@ export default function RootLayout({
           <Preloader />
           <SmoothScroll />
           <Cursor />
+          <AmbientGlow />
           <Grain />
           {children}
         </ThemeProvider>
