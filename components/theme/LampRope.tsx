@@ -53,10 +53,13 @@ export function LampRope({ anchorY, refs }: { anchorY: number; refs: RopeRefs })
       <defs>
         <linearGradient id="lamp-cord-gradient" x1="0" y1="0" x2="0" y2="1">
           {/* The cord emerges from shadow at the mount and gains material as
-              it descends toward the handle you are meant to reach for. */}
-          <stop offset="0%" stopColor="var(--color-faint)" />
-          <stop offset="55%" stopColor="var(--color-mute)" />
-          <stop offset="100%" stopColor="var(--color-bone-dim)" />
+              it descends toward the handle you are meant to reach for. The
+              three stops are lamp-local variables, not role tokens: the same
+              tokens that read as a cable on paper are invisible on the void.
+              See the `.lamp` block in theme.css. */}
+          <stop offset="0%" stopColor="var(--cord-top)" />
+          <stop offset="55%" stopColor="var(--cord-mid)" />
+          <stop offset="100%" stopColor="var(--cord-end)" />
         </linearGradient>
 
         <radialGradient id="lamp-glow-gradient">
